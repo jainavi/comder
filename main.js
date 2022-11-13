@@ -5,13 +5,15 @@ const { Client, Collection, GatewayIntentBits, Events } = require("discord.js");
 const { token } = require("./config.json");
 const mongoose = require("mongoose");
 
+const updateDatabase = require("./utilityFunctions/updateDatabase");
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildPresences
+    GatewayIntentBits.GuildPresences,
   ],
 });
 
@@ -46,16 +48,25 @@ for (const file of eventFiles) {
   if (event.once) {
     client.once(event.name, (...args) => {
       event.execute(...args);
+      setInterval(() => {
+        try {
+          updateDatabase();
+        } catch (e) {
+          console.log(e);
+        }
+      }, 1000);
     });
   } else {
     client.on(event.name, (...args) => event.execute(...args));
   }
 }
 
-client.login(token);
 mongoose
   .connect(
     "mongodb+srv://backend:z2UhvyLhMkmn23s1@cluster0.p5unwig.mongodb.net/comder?retryWrites=true&w=majority"
   )
-  .then((result) => console.log("Connectd to DataBase!"))
+  .then((result) => {
+    console.log("Connectd to DataBase!");
+    client.login(token);
+  })
   .catch((err) => console.log(err));

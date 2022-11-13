@@ -1,7 +1,8 @@
 let interval = "";
 const start = (channel, arg = "Comdeeeerrrrr !!!") => {
-  interval = setInterval(() => {
-    channel.send(arg);
+  interval = setInterval(async () => {
+    const msgRef = await channel.send(arg);
+    msgRef.edit("edited");
   }, 1000);
 };
 

@@ -15,9 +15,9 @@ const userSchema = new Schema({
     },
     questions: [
       {
-        difficulty: String,
-        difficulty: Number,
-        timeStamp: Object,
+        difficulty: { type: String, required: true },
+        quantity: { type: Number, required: true },
+        timeStamp: { type: Object, required: true },
       },
     ],
   },

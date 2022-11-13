@@ -11,9 +11,9 @@ const fetchAll = async (users) => {
   console.log(data);
 };
 
-const fetch = async (user) => {
+const fetchOne = async (userId) => {
   const query = `query userProblemsSolved {
-    matchedUser(username: "${user}") {
+    matchedUser(username: "${userId}") {
         submitStatsGlobal {
             acSubmissionNum {
                 difficulty
@@ -33,4 +33,4 @@ const fetch = async (user) => {
   return result.data.data.matchedUser.submitStatsGlobal.acSubmissionNum;
 };
 
-module.exports = { fetch, fetchAll };
+module.exports = { fetchOne, fetchAll };
