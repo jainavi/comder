@@ -6,6 +6,8 @@ const { token } = require("./config.json");
 const mongoose = require("mongoose");
 
 const updateDatabase = require("./utilityFunctions/updateDatabase");
+const leetCodeStatsLive = require("./utilityFunctions/leetcodeStatsLive");
+const { send } = require("./utilityFunctions/messageSend");
 
 const client = new Client({
   intents: [
@@ -48,13 +50,15 @@ for (const file of eventFiles) {
   if (event.once) {
     client.once(event.name, (...args) => {
       event.execute(...args);
-      setInterval(() => {
-        try {
-          updateDatabase();
-        } catch (e) {
-          console.log(e);
-        }
-      }, 1000);
+      send(
+        client.channels.cache.get("1041717419460280341"),
+        "Comdeerr Bot is Now Watching All COMDEERRSSSS!!......comdddeeeerrrrrrrrrrrr"
+      ).catch((err) => console.log(err));
+      leetCodeStatsLive(client).catch((err) => console.log(err));
+      setInterval(async () => {
+        await updateDatabase().catch((err) => console.log(err));
+        console.log("All User Database Updated");
+      }, 600000);
     });
   } else {
     client.on(event.name, (...args) => event.execute(...args));

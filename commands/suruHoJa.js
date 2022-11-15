@@ -1,9 +1,9 @@
 const { SlashCommandBuilder, bold } = require("discord.js");
-const { start } = require("../utilityFunctions/spam.js");
+const { send } = require("../utilityFunctions/messageSend.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("suru_ho_ja")
+    .setName("suru-ho-ja")
     .setDescription("Spams Comdeeeerrrrr!!")
     .addStringOption((option) =>
       option.setName("custom").setDescription("Spams the custom String")
@@ -22,6 +22,8 @@ module.exports = {
       : interaction.channelId;
     const channel = interaction.client.channels.cache.get(channelToSpam);
     const string = interaction.options.getString("custom");
-    string ? start(channel, string) : start(channel);
+    string
+      ? send(channel, string, true).catch((err) => console.log(err))
+      : send(channel, undefined, true).catch((err) => console.log(err));
   },
 };

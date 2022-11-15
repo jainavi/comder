@@ -1,12 +1,12 @@
 const { SlashCommandBuilder, bold } = require("discord.js");
-const { stop } = require("../utilityFunctions/spam.js");
+const { stopSpamming } = require("../utilityFunctions/messageSend.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("chup_ho_ja")
+    .setName("chup-ho-ja")
     .setDescription("Stops Spamming"),
   async execute(interaction) {
     await interaction.reply("Omk !!");
-    stop();
+    stopSpamming();
   },
 };
