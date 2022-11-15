@@ -52,7 +52,7 @@ for (const file of eventFiles) {
       event.execute(...args);
       send(
         client.channels.cache.get("1041717419460280341"),
-        "Comdeerr Bot is Now Watching All COMDEERRSSSS!!......comdddeeeerrrrrrrrrrrr"
+        "Comdeerr Bot is Now Watching All COMDEERRSSSS :smirk_cat:!!"
       ).catch((err) => console.log(err));
       leetCodeStatsLive(client).catch((err) => console.log(err));
       setInterval(async () => {
