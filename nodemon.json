@@ -1,0 +1,9 @@
+{
+  "env": {
+    "MONGO_USER": "backend",
+    "MONGO_PASSWORD": "z2UhvyLhMkmn23s1",
+    "MONGO_DEFAULT_DATABASE": "comder",
+    "CLINET_ID": "1038030483113652245",
+    "TOKEN": "MTAzODAzMDQ4MzExMzY1MjI0NQ.GV0oeE.5p7t3ryITFiaHn2KQ_wlEIlxduKkKt1-Jcq3lc"
+  }
+}
