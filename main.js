@@ -52,10 +52,10 @@ for (const file of eventFiles) {
     client.once(event.name, (...args) => {
       event.execute(...args);
 
-      send(
-        client.channels.cache.get("1041717419460280341"),
-        "Comdeerr Bot is Now Watching All COMDEERRSSSS :smirk_cat:!!"
-      ).catch((err) => console.log(err));
+      // send(
+      //   client.channels.cache.get("1038644053950087278"), // old value 1041717419460280341
+      //   "Comdeerr Bot is Now Watching All COMDEERRSSSS :smirk_cat:!!"
+      // ).catch((err) => console.log(err));
 
       leetCodeStatsLive(client).catch((err) => console.log(err));
 
@@ -74,8 +74,10 @@ mongoose
     `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.p5unwig.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`
   )
   .then((result) => {
-    console.log("Connectd to DataBase!");
+    console.log("Connected to DataBase!");
+    client.login(process.env.TOKEN).catch((err) => {
+      console.log(err);
+    });
     keepAlive();
-    client.login(process.env.TOKEN);
   })
   .catch((err) => console.log(err));

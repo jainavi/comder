@@ -2,8 +2,8 @@ const express = require("express");
 
 const server = express();
 
-server.all("/", (res, req) => {
-  res.setEncoding("Result: [OK].");
+server.all("/", (req, res) => {
+  res.send("Result: [OK].");
 });
 
 function keepAlive() {

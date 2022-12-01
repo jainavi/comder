@@ -2,8 +2,8 @@ const { bold } = require("discord.js");
 const User = require("../models/User");
 const { send } = require("./messageSend");
 
-const extraQues = [];
-const extraQuesPings = [];
+let extraQues = [];
+let extraQuesPings = [];
 let cDate = new Date(),
   nDate = new Date();
 nDate.setDate(nDate.getDate() + 1);
@@ -38,7 +38,7 @@ const contentGenerator = async (channel) => {
           `**${
             easyQ - extraQuesPings[index][1].quantity
           } easy** Ques. pil gae hai **${user.nickName}** se BC!`
-        );
+        ).catch((err) => console.log(err));
       }
       if (mediumQ - extraQuesPings[index][2].quantity > 0) {
         send(
@@ -46,7 +46,7 @@ const contentGenerator = async (channel) => {
           `**${
             mediumQ - extraQuesPings[index][2].quantity
           } medium** Ques. pil gae hai **${user.nickName}** se BC!`
-        );
+        ).catch((err) => console.log(err));
       }
       if (hardQ - extraQuesPings[index][3].quantity > 0) {
         send(
@@ -54,7 +54,7 @@ const contentGenerator = async (channel) => {
           `**${
             hardQ - extraQuesPings[index][3].quantity
           } hard** Ques. pil gae hai **${user.nickName}** se BC!`
-        );
+        ).catch((err) => console.log(err));
       }
 
       const userBlock = `${bold(
@@ -73,6 +73,7 @@ const contentGenerator = async (channel) => {
     });
     if (cDate > nDate) {
       extraQues = [];
+      extraQuesPings = [];
       nDate.setDate(nDate.getDate() + 1);
       nDate.setHours(0, 0, 0, 0);
     }
@@ -84,17 +85,17 @@ const contentGenerator = async (channel) => {
 };
 
 const leetCodeStatsLive = async (client) => {
-  const channel = client.channels.cache.get("1041617974332756049");
+  const channel = client.channels.cache.get("1038644053950087278"); // old value is 1041617974332756049
   const content = await contentGenerator(
-    client.channels.cache.get("1041717419460280341")
+    client.channels.cache.get("1038644053950087278") // old value is 1041717419460280341
   );
   if (content) {
-    const msgRef = await channel.send(content);
+    const msgRef = await channel.send(content).catch((err) => console.log(err));
     setInterval(async () => {
       const content = await contentGenerator(
-        client.channels.cache.get("1041717419460280341")
-      );
-      await msgRef.edit(content);
+        client.channels.cache.get("1038644053950087278") // old value is 1041717419460280341
+      ).catch((err) => console.log(err));
+      await msgRef.edit(content).catch((err) => console.log(err));
       console.log("All Stats Updated!");
     }, 600000);
   }

@@ -29,7 +29,7 @@ module.exports = {
         const userData = data[0];
         const questionsArr = userData.leetCode.questions;
         const currDate = dayjs();
-        for (let i = 0; i < questionsArr.length; i++) {
+        for (let i = questionsArr.length - 1; i >= 0; i--) {
           const timeStamp = questionsArr[i].timeStamp;
           if (currDate.diff(timeStamp, "day") <= period) {
             if (questionsArr[i].difficulty == "easy") {
