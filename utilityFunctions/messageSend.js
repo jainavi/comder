@@ -1,6 +1,7 @@
 const intervalsArr = [];
 
 const send = async (channel, arg = "Comdeeeerrrrr !!!", spam = false) => {
+  let msgRef;
   if (spam) {
     intervalsArr.push(
       setInterval(async () => {
@@ -9,7 +10,8 @@ const send = async (channel, arg = "Comdeeeerrrrr !!!", spam = false) => {
     );
     return;
   }
-  await channel.send(arg);
+  msgRef = await channel.send(arg);
+  return msgRef;
 };
 
 const stopSpamming = () => {

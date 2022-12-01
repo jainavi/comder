@@ -5,9 +5,8 @@ const http = require("node:http");
 const { Client, Collection, GatewayIntentBits, Events } = require("discord.js");
 const mongoose = require("mongoose");
 
-const updateDatabase = require("./utilityFunctions/updateDatabase");
-const leetCodeStatsLive = require("./utilityFunctions/leetcodeStatsLive");
-const { send } = require("./utilityFunctions/messageSend");
+const updateDatabase = require("./utilityFunctions/updateDatabase"); //requires client access
+const leetcodeManager = require("./utilityFunctions/leetcodeManager");
 const keepAlive = require("./server");
 
 const client = new Client({
@@ -19,6 +18,8 @@ const client = new Client({
     GatewayIntentBits.GuildPresences,
   ],
 });
+
+const lcManager = leetcodeManager(client);
 
 const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs
@@ -51,18 +52,6 @@ for (const file of eventFiles) {
   if (event.once) {
     client.once(event.name, (...args) => {
       event.execute(...args);
-
-      // send(
-      //   client.channels.cache.get("1038644053950087278"), // old value 1041717419460280341
-      //   "Comdeerr Bot is Now Watching All COMDEERRSSSS :smirk_cat:!!"
-      // ).catch((err) => console.log(err));
-
-      leetCodeStatsLive(client).catch((err) => console.log(err));
-
-      setInterval(async () => {
-        await updateDatabase().catch((err) => console.log(err));
-        console.log("All User Database Updated");
-      }, 600000);
     });
   } else {
     client.on(event.name, (...args) => event.execute(...args));
@@ -75,6 +64,22 @@ mongoose
   )
   .then((result) => {
     console.log("Connected to DataBase!");
+    setInterval(async () => {
+      try {
+        await updateDatabase(client);
+        console.log("All User Database Updated");
+        lcManager
+          .leetcodeStatsLive()
+          .then(() => console.log("All Users Stats Updated"))
+          .catch((err) => {
+            console.log(err);
+            console.log("Can't show leetcode stats live");
+          });
+      } catch (e) {
+        console.log(e);
+        console.log("Can't Update Database !");
+      }
+    }, 600000);
     client.login(process.env.TOKEN).catch((err) => {
       console.log(err);
     });

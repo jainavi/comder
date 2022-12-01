@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
-const { fetchOne } = require("../utilityFunctions/fetchLeetcode");
+const lcManager = require("../utilityFunctions/leetcodeManager");
+const fetch = lcManager().fetch;
 const User = require("../models/User");
 
 module.exports = {
@@ -45,7 +46,7 @@ module.exports = {
     }
     let leetCodeData = null;
     try {
-      leetCodeData = await fetchOne(leetcodeId);
+      leetCodeData = await fetch(leetcodeId);
     } catch (e) {
       console.log(e);
       await interaction.editReply("Can't Fetch Data!");

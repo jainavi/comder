@@ -20,6 +20,12 @@ const userSchema = new Schema({
         timeStamp: { type: Object, required: true },
       },
     ],
+    questionsDaily: [
+      {
+        difficulty: { type: String, required: true },
+        quantity: { type: Number, required: true },
+      },
+    ],
   },
 });
 
