@@ -59,17 +59,16 @@ const ping = (client) => {
 					platformEntry.diff.forEach(async (data) => {
 						if (data.count > 0) {
 							await channel.send(
-								`${platformEntry.userName} se ${platformEntry.platform} me ${data.count} ${data.difficulty} ques. nipat gae`
+								`**${platformEntry.userName}** se **${platformEntry.platform}** me **${data.count}** **${data.difficulty}** ques. nipat gae`
 							);
 						}
 					});
 				});
 			});
-			console.log('Pinged!');
 		} catch (err) {
 			errorHandler(err);
 		}
-	}, 6000);
+	}, 60000);
 };
 
 module.exports = { ping };
