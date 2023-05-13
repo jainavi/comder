@@ -4,7 +4,7 @@ const User = require('../models/User');
 const errorHandler = require('./errorHandler');
 const { fetchAll } = require('./leetcode');
 
-const pingChannelId = '1038644053950087278';
+const pingChannelId = '1041717419460280341';
 
 const databaseSync = async () => {
 	const userArr = await User.find({});
@@ -68,7 +68,7 @@ const ping = (client) => {
 		} catch (err) {
 			errorHandler(err);
 		}
-	}, 60000);
+	}, 600000);
 };
 
 module.exports = { ping };
