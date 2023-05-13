@@ -12,6 +12,12 @@ const userSchema = new Schema({
 			default: [],
 		},
 	},
+	gfg: {
+		id: { type: String, required: true },
+	},
+	codeStudio: {
+		id: { type: String },
+	},
 	questionsArr: {
 		type: [
 			{

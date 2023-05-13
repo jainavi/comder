@@ -1,8 +1,8 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
-const lcManager = require('../../utilityFunctions/leetcode');
-// const fetch = lcManager().fetch;
-// const User = require('../../models/User');
+const { fetchOne } = require('../../utilityFunctions/leetcode');
+const User = require('../../models/User');
+const errorHandler = require('../../utilityFunctions/errorHandler');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,6 +13,15 @@ module.exports = {
 				.setName('leetcode-id')
 				.setDescription('Sets the leetcode id')
 				.setRequired(true)
+		)
+		.addStringOption((option) =>
+			option.setName('gfg-id').setDescription('Sets the gfg id').setRequired(true)
+		)
+		.addStringOption((option) =>
+			option
+				.setName('code-studio-id')
+				.setDescription('Sets the code studio id')
+				.setRequired(false)
 		)
 		.addUserOption((option) =>
 			option
@@ -27,58 +36,39 @@ module.exports = {
 				.setRequired(true)
 		),
 	async execute(interaction) {
-		await interaction.reply('Feature coming soon!');
-		// await interaction.deferReply();
-		// const discordId = interaction.options.getUser('tag-the-user').id;
-		// const leetcodeId = interaction.options.getString('leetcode-id');
-		// const nickName = interaction.options.getString('nickname');
-		// let userData;
-		// try {
-		// 	userData = await User.find({ discordId: discordId });
-		// } catch (e) {
-		// 	console.log(e);
-		// 	// eslint-disable-next-line quotes
-		// 	await interaction.editReply("Can't connect to database!");
-		// 	return;
-		// }
-		// if (userData.length) {
-		// 	await interaction.editReply('User already exist');
-		// 	return;
-		// }
-		// let leetCodeData = null;
-		// try {
-		// 	leetCodeData = await fetch(leetcodeId);
-		// } catch (e) {
-		// 	console.log(e);
-		// 	// eslint-disable-next-line quotes
-		// 	await interaction.editReply("Can't Fetch Data!");
-		// 	return;
-		// }
-		// if (leetCodeData) {
-		// 	const user = new User({
-		// 		discordId,
-		// 		nickName,
-		// 		leetCode: {
-		// 			id: leetcodeId,
-		// 			difficulty: {
-		// 				total: leetCodeData[0].count,
-		// 				easy: leetCodeData[1].count,
-		// 				medium: leetCodeData[2].count,
-		// 				hard: leetCodeData[3].count,
-		// 			},
-		// 			questions: [],
-		// 		},
-		// 	});
-		// 	user
-		// 		.save()
-		// 		.then((result) => {
-		// 			interaction.editReply('User Added!');
-		// 		})
-		// 		.catch((err) => {
-		// 			console.log(err);
-		// 			// eslint-disable-next-line quotes
-		// 			interaction.editReply("Can't Add User To Database!");
-		// 		});
-		// }
+		await interaction.deferReply();
+
+		const discordId = interaction.options.getUser('tag-the-user').id;
+		const leetcodeId = interaction.options.getString('leetcode-id');
+		const gfgId = interaction.options.getString('gfg-id');
+		const codeStudioId = interaction.options.getString('code-studio-id');
+		const nickName = interaction.options.getString('nickname');
+		try {
+			const userData = await User.find({ discordId: discordId });
+			if (userData.length > 0) {
+				await interaction.editReply('User already exist');
+				return;
+			}
+			const leetCodeData = await fetchOne(leetcodeId);
+			const user = new User({
+				discordId,
+				nickName,
+				leetCode: {
+					id: leetcodeId,
+					stats: leetCodeData,
+				},
+				gfg: {
+					id: gfgId,
+				},
+				codeStudio: {
+					id: codeStudioId,
+				},
+			});
+			await user.save();
+			await interaction.editReply('User Added!');
+		} catch (err) {
+			await interaction.editReply('Oops! an error occured');
+			errorHandler(err);
+		}
 	},
 };

@@ -4,9 +4,9 @@ const User = require('../models/User');
 
 const leetcodeFetchUrl = 'https://leetcode.com/graphql/';
 
-const fetchOne = async (discordId) => {
-	const user = await User.findOne({ discordId }, 'leetCode.id');
-	const userId = user.leetCode.id;
+const fetchOne = async (userId) => {
+	// const user = await User.findOne({ discordId }, 'leetCode.id');
+	// const userId = user.leetCode.id;
 
 	const query = `query userProblemsSolved {
 	matchedUser(username: "${userId}") {
@@ -35,7 +35,7 @@ const fetchAll = async () => {
 
 	for (let i = 0; i < userArr.length; i++) {
 		const discordId = userArr[i].discordId;
-		const userState = await fetchOne(discordId);
+		const userState = await fetchOne(userArr[i].leetCode.id);
 		userMap.set(discordId, userState);
 	}
 

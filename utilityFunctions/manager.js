@@ -2,7 +2,7 @@ const dayjs = require('dayjs');
 
 const User = require('../models/User');
 const errorHandler = require('./errorHandler');
-const leetCode = require('./leetcode');
+const { fetchAll } = require('./leetcode');
 
 const pingChannelId = '1038644053950087278';
 
@@ -14,7 +14,7 @@ const databaseSync = async () => {
 	}
 
 	// LEETCODE
-	const newStatsMap = await leetCode.fetchAll();
+	const newStatsMap = await fetchAll();
 	await Promise.all(
 		userArr.map(async (user) => {
 			const discordId = user.discordId;
