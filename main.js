@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 const { Client, Collection, GatewayIntentBits, Events } = require('discord.js');
 require('dotenv').config();
 
-const updateDatabase = require('./utilityFunctions/updateDatabase');
-const leetcodeManager = require('./utilityFunctions/leetcodeManager');
+const manager = require('./utilityFunctions/manager');
 const keepAlive = require('./utilityFunctions/server');
 const errorHandler = require('./utilityFunctions/errorHandler');
+const User = require('./models/User');
 
 // CONFIGRATIONS
 // Initializing client
@@ -62,32 +62,15 @@ for (const file of eventFiles) {
 }
 // Declaring variables
 const { TOKEN, MONGO_USER, MONGO_PASSWORD } = process.env;
-// const lcManager = leetcodeManager(client);
 
 // LOADING THE BOT
 mongoose
 	.connect(
-		`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.p5unwig.mongodb.net/`
+		`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.p5unwig.mongodb.net/comder?retryWrites=true&w=majority`
 	)
-	.then((result) => {
+	.then(() => {
 		console.log('Connected to DataBase!');
-		// setInterval(async () => {
-		// 	try {
-		// 		await updateDatabase(client);
-		// 		console.log('All User Database Updated');
-		// 		// lcManager
-		// 		//   .leetcodeStatsLive()
-		// 		//   .then(() => console.log("All Users Stats Updated"))
-		// 		//   .catch((err) => {
-		// 		//     console.log(err);
-		// 		//     console.log("Can't show leetcode stats live");
-		// 		//   });
-		// 	} catch (e) {
-		// 		console.log(e);
-		// 		// eslint-disable-next-line quotes
-		// 		console.log("Can't Update Database !");
-		// 	}
-		// }, 600000);
+		manager.ping(client);
 		client.login(TOKEN).catch((err) => errorHandler(err));
 		keepAlive();
 	})

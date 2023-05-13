@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, bold } = require('discord.js');
-const User = require('../../models/User');
-const dayjs = require('dayjs');
+const { SlashCommandBuilder } = require('discord.js');
+// const User = require('../../models/User');
+// const dayjs = require('dayjs');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,47 +13,48 @@ module.exports = {
 			option
 				.setName('days')
 				.setDescription('Set the number of days')
-				.setRequired(true)
+				.setRequired(false)
 		),
 	async execute(interaction) {
-		await interaction.deferReply();
-		const user = interaction.options.getUser('user');
-		const period = interaction.options.getNumber('days');
-		const numberQuestion = { total: 0, easy: 0, medium: 0, hard: 0 };
-		User.find({ discordId: user.id })
-			.then((data) => {
-				if (!data) {
-					interaction.editReply('Koi user nahi hai aisa behen ke land!');
-					return;
-				}
-				const userData = data[0];
-				const questionsArr = userData.leetCode.questions;
-				const currDate = dayjs();
-				for (let i = questionsArr.length - 1; i >= 0; i--) {
-					const timeStamp = questionsArr[i].timeStamp;
-					if (currDate.diff(timeStamp, 'day') <= period) {
-						if (questionsArr[i].difficulty == 'easy') {
-							numberQuestion.easy += questionsArr[i].quantity;
-							numberQuestion.total += questionsArr[i].quantity;
-						} else if (questionsArr[i].difficulty == 'medium') {
-							numberQuestion.medium += questionsArr[i].quantity;
-							numberQuestion.total += questionsArr[i].quantity;
-						} else {
-							numberQuestion.hard += questionsArr[i].quantity;
-							numberQuestion.total += questionsArr[i].quantity;
-						}
-					} else {
-						break;
-					}
-				}
-				interaction.editReply(
-					`${user.username} ne ${period} din me  \`t: ${numberQuestion.total}\`  \`e: ${numberQuestion.easy}\`  \`m: ${numberQuestion.medium}\`  \`h: ${numberQuestion.hard}\` questions nipta deye BC!`
-				);
-			})
-			.catch((err) => {
-				console.log(err);
-				// eslint-disable-next-line quotes
-				interaction.editReply("Sorry Can't Fetch! An Error Occured!");
-			});
+		await interaction.reply('Feature coming soon!');
+		// await interaction.deferReply();
+		// const user = interaction.options.getUser('user');
+		// const period = interaction.options.getNumber('days') || 1;
+		// const numberQuestion = { total: 0, easy: 0, medium: 0, hard: 0 };
+		// User.find({ discordId: user.id })
+		// 	.then((data) => {
+		// 		if (!data) {
+		// 			interaction.editReply('Koi user nahi hai aisa behen ke land!');
+		// 			return;
+		// 		}
+		// 		const userData = data[0];
+		// 		const questionsArr = userData.leetCode.questions;
+		// 		const currDate = dayjs();
+		// 		for (let i = questionsArr.length - 1; i >= 0; i--) {
+		// 			const timeStamp = questionsArr[i].timeStamp;
+		// 			if (currDate.diff(timeStamp, 'day') <= period) {
+		// 				if (questionsArr[i].difficulty == 'easy') {
+		// 					numberQuestion.easy += questionsArr[i].quantity;
+		// 					numberQuestion.total += questionsArr[i].quantity;
+		// 				} else if (questionsArr[i].difficulty == 'medium') {
+		// 					numberQuestion.medium += questionsArr[i].quantity;
+		// 					numberQuestion.total += questionsArr[i].quantity;
+		// 				} else {
+		// 					numberQuestion.hard += questionsArr[i].quantity;
+		// 					numberQuestion.total += questionsArr[i].quantity;
+		// 				}
+		// 			} else {
+		// 				break;
+		// 			}
+		// 		}
+		// 		interaction.editReply(
+		// 			`${user.username} ne ${period} din me  \`t: ${numberQuestion.total}\`  \`e: ${numberQuestion.easy}\`  \`m: ${numberQuestion.medium}\`  \`h: ${numberQuestion.hard}\` questions nipta deye BC!`
+		// 		);
+		// 	})
+		// 	.catch((err) => {
+		// 		console.log(err);
+		// 		// eslint-disable-next-line quotes
+		// 		interaction.editReply("Sorry Can't Fetch! An Error Occured!");
+		// 	});
 	},
 };

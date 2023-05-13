@@ -9,8 +9,6 @@
 	},
 	"rules": {
 		"arrow-spacing": ["warn", { "before": true, "after": true }],
-		// "brace-style": "off",
-		// "comma-dangle": ["error", "always-multiline"],
 		"comma-spacing": "error",
 		"comma-style": "error",
 		"curly": ["error", "multi-line", "consistent"],
@@ -32,7 +30,7 @@
 		"no-var": "error",
 		"no-unused-vars": "warn",
 		"object-curly-spacing": ["error", "always"],
-		"prefer-const": "error",
+		"prefer-const": "warn",
 		"quotes": ["error", "single"],
 		"semi": ["error", "always"],
 		"space-before-blocks": "error",
