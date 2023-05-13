@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node main.js",
-    "start:dev":"nodemon main.js"
+    "start:dev": "nodemon main.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,11 +14,12 @@
     "axios": "^1.1.3",
     "dayjs": "^1.11.6",
     "discord.js": "^14.6.0",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongodb": "^4.11.0",
     "mongoose": "^6.7.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "eslint": "^8.40.0"
   }
 }

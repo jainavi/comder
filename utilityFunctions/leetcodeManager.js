@@ -5,6 +5,7 @@ const User = require("../models/User");
 const { send } = require("./messageSend");
 
 const leetcodeManager = (client = null) => {
+  const leetcodeStatsLiveChannelId = "1041617974332756049"; // 1041617974332756049
   const leetcodeFetchUrl = "https://leetcode.com/graphql/";
   let liveStatsMsgRef;
 
@@ -30,12 +31,17 @@ const leetcodeManager = (client = null) => {
     return result.data.data.matchedUser.submitStatsGlobal.acSubmissionNum;
   };
 
-  const ping = (userName, difficulty, quantity, channelId) => {
-    const channel = client.channels.cache.get(channelId);
-    send(
-      channel,
-      `**${quantity} ${difficulty}** Ques. nipat gaya hai **${userName}** se BC!`
-    ).catch((err) => console.log(err));
+  const ping = async (userName, difficulty, quantity, channelId) => {
+    try {
+      const channel = client.channels.cache.get(channelId);
+      send(
+        channel,
+        `**${quantity} ${difficulty}** Ques. nipat gaya hai **${userName}** se BC!`
+      );
+    } catch (e) {
+      console.log("Can't Ping!");
+      console.log(e);
+    }
   };
 
   const contentGenerator = async () => {
@@ -66,7 +72,7 @@ const leetcodeManager = (client = null) => {
   };
 
   const leetcodeStatsLive = async () => {
-    const channel = client.channels.cache.get("1038644053950087278"); // old value is 1041617974332756049
+    const channel = client.channels.cache.get(leetcodeStatsLiveChannelId);
 
     contentGenerator()
       .then(async (content) => {
