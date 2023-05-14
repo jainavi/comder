@@ -5,9 +5,6 @@ const User = require('../models/User');
 const leetcodeFetchUrl = 'https://leetcode.com/graphql/';
 
 const fetchOne = async (userId) => {
-	// const user = await User.findOne({ discordId }, 'leetCode.id');
-	// const userId = user.leetCode.id;
-
 	const query = `query userProblemsSolved {
 	matchedUser(username: "${userId}") {
 		submitStatsGlobal {
@@ -30,7 +27,7 @@ const fetchOne = async (userId) => {
 };
 
 const fetchAll = async () => {
-	const userArr = await User.find({}, 'discordId');
+	const userArr = await User.find({}, ['discordId', 'leetCode.id']);
 	const userMap = new Map();
 
 	for (let i = 0; i < userArr.length; i++) {
@@ -41,19 +38,5 @@ const fetchAll = async () => {
 
 	return userMap;
 };
-
-// const ping = async (client, userName, difficulty, quantity, channelId) => {
-// 	try {
-// 		const channel = client.channels.cache.get(channelId);
-// 		send(
-// 			channel,
-// 			`**${quantity} ${difficulty}** Ques. nipat gaya hai **${userName}** se BC!`
-// 		);
-// 	} catch (e) {
-// 		// eslint-disable-next-line quotes
-// 		console.log("Can't Ping!");
-// 		console.log(e);
-// 	}
-// };
 
 module.exports = { fetchOne, fetchAll };

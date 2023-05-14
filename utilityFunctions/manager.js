@@ -4,7 +4,7 @@ const User = require('../models/User');
 const errorHandler = require('./errorHandler');
 const { fetchAll } = require('./leetcode');
 
-const pingChannelId = '1041717419460280341';
+const pingChannelId = '1038644053950087278';
 
 const databaseSync = async () => {
 	const userArr = await User.find({});
@@ -15,6 +15,7 @@ const databaseSync = async () => {
 
 	// LEETCODE
 	const newStatsMap = await fetchAll();
+	console.log(newStatsMap);
 	await Promise.all(
 		userArr.map(async (user) => {
 			const discordId = user.discordId;
@@ -39,7 +40,12 @@ const databaseSync = async () => {
 			}
 			userQuestionDiffMap
 				.get(discordId)
-				.push({ platform: 'leetCode', diff: diffArr, userName: user.nickName });
+				.push({
+					platform: 'leetCode',
+					diff: diffArr,
+					nickName: user.nickName,
+					leetCodeId: user.leetCode.id,
+				});
 			user.leetCode.stats = newStats;
 			await user.save();
 		})
@@ -59,7 +65,7 @@ const ping = (client) => {
 					platformEntry.diff.forEach(async (data) => {
 						if (data.count > 0) {
 							await channel.send(
-								`**${platformEntry.userName}** se **${platformEntry.platform}** me **${data.count}** **${data.difficulty}** ques. nipat gae`
+								`**${platformEntry.nickName}**(${platformEntry.leetCodeId}) se **${platformEntry.platform}** me **${data.count}** **${data.difficulty}** ques. nipat gae`
 							);
 						}
 					});
@@ -68,7 +74,7 @@ const ping = (client) => {
 		} catch (err) {
 			errorHandler(err);
 		}
-	}, 600000);
+	}, 5000);
 };
 
 module.exports = { ping };
