@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
-// const User = require('../../models/User');
-// const dayjs = require('dayjs');
+const User = require('../../models/User');
+const dayjs = require('dayjs');
+const errorHandler = require('../../utilityFunctions/errorHandler');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,45 +17,46 @@ module.exports = {
 				.setRequired(false)
 		),
 	async execute(interaction) {
-		await interaction.reply('Feature coming soon!');
-		// await interaction.deferReply();
-		// const user = interaction.options.getUser('user');
-		// const period = interaction.options.getNumber('days') || 1;
-		// const numberQuestion = { total: 0, easy: 0, medium: 0, hard: 0 };
-		// User.find({ discordId: user.id })
-		// 	.then((data) => {
-		// 		if (!data) {
-		// 			interaction.editReply('Koi user nahi hai aisa behen ke land!');
-		// 			return;
-		// 		}
-		// 		const userData = data[0];
-		// 		const questionsArr = userData.leetCode.questions;
-		// 		const currDate = dayjs();
-		// 		for (let i = questionsArr.length - 1; i >= 0; i--) {
-		// 			const timeStamp = questionsArr[i].timeStamp;
-		// 			if (currDate.diff(timeStamp, 'day') <= period) {
-		// 				if (questionsArr[i].difficulty == 'easy') {
-		// 					numberQuestion.easy += questionsArr[i].quantity;
-		// 					numberQuestion.total += questionsArr[i].quantity;
-		// 				} else if (questionsArr[i].difficulty == 'medium') {
-		// 					numberQuestion.medium += questionsArr[i].quantity;
-		// 					numberQuestion.total += questionsArr[i].quantity;
-		// 				} else {
-		// 					numberQuestion.hard += questionsArr[i].quantity;
-		// 					numberQuestion.total += questionsArr[i].quantity;
-		// 				}
-		// 			} else {
-		// 				break;
-		// 			}
-		// 		}
-		// 		interaction.editReply(
-		// 			`${user.username} ne ${period} din me  \`t: ${numberQuestion.total}\`  \`e: ${numberQuestion.easy}\`  \`m: ${numberQuestion.medium}\`  \`h: ${numberQuestion.hard}\` questions nipta deye BC!`
-		// 		);
-		// 	})
-		// 	.catch((err) => {
-		// 		console.log(err);
-		// 		// eslint-disable-next-line quotes
-		// 		interaction.editReply("Sorry Can't Fetch! An Error Occured!");
-		// 	});
+		await interaction.deferReply();
+		const user = interaction.options.getUser('user');
+		const period = interaction.options.getNumber('days') || 1;
+		const currDate = dayjs();
+		const platformQuestionMap = new Map();
+
+		try {
+			const userObj = await User.findOne({ discordId: user.id });
+			if (!userObj) {
+				await interaction.editReply('No user found');
+				return;
+			}
+
+			const quesArr = userObj.questionsArr.filter((doc) => {
+				return currDate.diff(doc.timeStamp, 'day') <= period;
+			});
+			quesArr.forEach((doc) => {
+				if (!platformQuestionMap.has(doc.platform)) {
+					platformQuestionMap.set(doc.platform, {
+						All: 0,
+						Easy: 0,
+						Medium: 0,
+						Hard: 0,
+					});
+				}
+				const quesObj = platformQuestionMap.get(doc.platform);
+				quesObj[doc.difficulty] += doc.quantity;
+				platformQuestionMap.set(doc.platform, quesObj);
+			});
+			let statsMsg = `These are **${period} day** stats\n\n`;
+			platformQuestionMap.forEach((value, key) => {
+				statsMsg += `${key} Stats (id: ${userObj[key].id}) :\n\`t: ${value.All}\te: ${value.Easy}\tm: ${value.Medium}\th: ${value.Hard}\`\n\n`;
+			});
+			await interaction.editReply(
+				statsMsg === `These are **${period} day** stats\n\n`
+					? 'No stats available'
+					: statsMsg
+			);
+		} catch (err) {
+			errorHandler(err);
+		}
 	},
 };

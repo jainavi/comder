@@ -5,7 +5,6 @@ module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
 		if (!interaction.isChatInputCommand()) {
-			console.log(interaction);
 			return;
 		}
 

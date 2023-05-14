@@ -15,7 +15,6 @@ const databaseSync = async () => {
 
 	// LEETCODE
 	const newStatsMap = await fetchAll();
-	console.log(newStatsMap);
 	await Promise.all(
 		userArr.map(async (user) => {
 			const discordId = user.discordId;
@@ -38,14 +37,12 @@ const databaseSync = async () => {
 					});
 				}
 			}
-			userQuestionDiffMap
-				.get(discordId)
-				.push({
-					platform: 'leetCode',
-					diff: diffArr,
-					nickName: user.nickName,
-					leetCodeId: user.leetCode.id,
-				});
+			userQuestionDiffMap.get(discordId).push({
+				platform: 'leetCode',
+				diff: diffArr,
+				nickName: user.nickName,
+				leetCodeId: user.leetCode.id,
+			});
 			user.leetCode.stats = newStats;
 			await user.save();
 		})
@@ -74,7 +71,7 @@ const ping = (client) => {
 		} catch (err) {
 			errorHandler(err);
 		}
-	}, 5000);
+	}, 600000);
 };
 
 module.exports = { ping };
