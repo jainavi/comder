@@ -1,13 +1,12 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const mongoose = require('mongoose');
-const { Client, Collection, GatewayIntentBits, Events } = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 
 const manager = require('./utilityFunctions/manager');
 const keepAlive = require('./utilityFunctions/server');
 const errorHandler = require('./utilityFunctions/errorHandler');
-const User = require('./models/User');
 
 // CONFIGRATIONS
 // Initializing client
