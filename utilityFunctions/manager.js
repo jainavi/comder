@@ -26,13 +26,13 @@ const databaseSync = async () => {
 	await Promise.all(
 		userArr.map(async (user) => {
 			const discordId = user.discordId;
-			const diffArr = [];
 
 			// ITERATING OVER EACH PLATFORM
 			await Promise.all(
 				platformArr.map((platformObj) => {
 					const oldStats = user[platformObj.name].stats;
 					const newStats = platformObj.userStats.get(discordId);
+					const diffArr = [];
 
 					// ITERATING OVER EACH DIFFICULTIES
 					for (let j = 0; j < oldStats.length; j++) {
@@ -57,7 +57,7 @@ const databaseSync = async () => {
 						nickName: user.nickName,
 						leetCodeId: user.leetCode.id,
 					});
-					user[platformObj].stats = newStats;
+					user[platformObj.name].stats = newStats;
 				})
 			);
 			await user.save();
@@ -76,7 +76,7 @@ const ping = (client) => {
 			diffMap.forEach((diffArr) => {
 				diffArr.forEach((platformEntry) => {
 					platformEntry.diff.forEach(async (data) => {
-						if (data.count > 0) {
+						if (data.count > 0 && data.difficulty != 'All') {
 							await channel.send(
 								`**${platformEntry.nickName}**(lc_id: ${platformEntry.leetCodeId}) se **${platformEntry.platform}** me **${data.count}** **${data.difficulty}** ques. nipat gae`
 							);
@@ -87,7 +87,7 @@ const ping = (client) => {
 		} catch (err) {
 			errorHandler(err);
 		}
-	}, 6000);
+	}, 30000);
 };
 
 module.exports = { ping };
