@@ -14,9 +14,17 @@ const userSchema = new Schema({
 	},
 	gfg: {
 		id: { type: String, required: true },
+		stats: {
+			type: [{ difficulty: { type: String }, count: { type: Number } }],
+			default: [],
+		},
 	},
 	codeStudio: {
 		id: { type: String },
+		stats: {
+			type: [{ difficulty: { type: String }, count: { type: Number } }],
+			default: [],
+		},
 	},
 	questionsArr: {
 		type: [

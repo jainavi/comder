@@ -39,4 +39,4 @@ const fetchAll = async () => {
 	return userMap;
 };
 
-module.exports = { fetchOne, fetchAll };
+module.exports = { name: 'leetCode', fetchOne, fetchAll };
