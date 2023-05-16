@@ -74,3 +74,5 @@ mongoose
 		keepAlive();
 	})
 	.catch((err) => errorHandler(err));
+
+module.exports = client;

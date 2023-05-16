@@ -23,7 +23,9 @@ const fetchOne = async (userId) => {
 		},
 	});
 	// [{ difficulty: All, count:}, { difficulty: Easy, count:}, { difficulty: Medium, count:}, { difficulty: Hard, count:}];
-	return result.data.data.matchedUser.submitStatsGlobal.acSubmissionNum;
+	return result.data.errors
+		? null
+		: result.data.data.matchedUser.submitStatsGlobal.acSubmissionNum;
 };
 
 const fetchAll = async () => {
@@ -33,7 +35,9 @@ const fetchAll = async () => {
 	for (let i = 0; i < userArr.length; i++) {
 		const discordId = userArr[i].discordId;
 		const userState = await fetchOne(userArr[i].leetCode.id);
-		userMap.set(discordId, userState);
+		if (userState) {
+			userMap.set(discordId, userState);
+		}
 	}
 
 	return userMap;

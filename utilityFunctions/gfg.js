@@ -8,6 +8,10 @@ const gfgFetchUrl = 'https://auth.geeksforgeeks.org/user/';
 const fetchOne = async (userId) => {
 	const { data: sourceHtml } = await axios.get(gfgFetchUrl + userId);
 	const $ = cheerio.load(sourceHtml);
+	if (!$('.tab').text()) {
+		return null;
+	}
+
 	const statsString = $('.tab').next().next().text();
 	const userStat = [
 		{ difficulty: 'All', count: 0 },
@@ -39,9 +43,13 @@ const fetchAll = async () => {
 	for (let i = 0; i < userArr.length; i++) {
 		const discordId = userArr[i].discordId;
 		const userState = await fetchOne(userArr[i].gfg.id);
-		userMap.set(discordId, userState);
+		if (userState) {
+			userMap.set(discordId, userState);
+		}
 	}
 	return userMap;
 };
+
+fetchOne('avisomil140');
 
 module.exports = { name: 'gfg', fetchOne, fetchAll };

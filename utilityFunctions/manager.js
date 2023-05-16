@@ -6,6 +6,7 @@ const leetCode = require('./leetcode');
 const gfg = require('./gfg');
 
 const pingChannelId = '1038644053950087278';
+const errorChannelId = '1038644053950087278';
 
 const databaseSync = async () => {
 	const userArr = await User.find({});
@@ -33,7 +34,9 @@ const databaseSync = async () => {
 					const oldStats = user[platformObj.name].stats;
 					const newStats = platformObj.userStats.get(discordId);
 					const diffArr = [];
-
+					if (!newStats) {
+						return;
+					}
 					// ITERATING OVER EACH DIFFICULTIES
 					for (let j = 0; j < oldStats.length; j++) {
 						const difficulty = oldStats[j].difficulty;
@@ -69,7 +72,7 @@ const databaseSync = async () => {
 };
 
 const ping = (client) => {
-	setInterval(async () => {
+	setTimeout(async () => {
 		try {
 			const diffMap = await databaseSync();
 			const channel = client.channels.cache.get(pingChannelId);
@@ -78,16 +81,25 @@ const ping = (client) => {
 					platformEntry.diff.forEach(async (data) => {
 						if (data.count > 0 && data.difficulty != 'All') {
 							await channel.send(
-								`**${platformEntry.nickName}**(lc_id: ${platformEntry.leetCodeId}) se **${platformEntry.platform}** me **${data.count}** **${data.difficulty}** ques. nipat gae`
+								`**${platformEntry.nickName}**(lc_id: ${
+									platformEntry.leetCodeId
+								}) ${platformEntry.platform.toUpperCase()} --> **${data.count} ${
+									data.difficulty
+								}**`
 							);
 						}
 					});
 				});
 			});
 		} catch (err) {
-			errorHandler(err);
+			errorHandler(err, async () => {
+				const channel = client.channels.cache.get(errorChannelId);
+				await channel.send(
+					'Something went wrong! Please refer ./error.log for more info'
+				);
+			});
 		}
-	}, 30000);
+	}, 6000);
 };
 
 module.exports = { ping };
