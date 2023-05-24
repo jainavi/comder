@@ -46,12 +46,12 @@ module.exports = {
 				quesObj[doc.difficulty] += doc.quantity;
 				platformQuestionMap.set(doc.platform, quesObj);
 			});
-			let statsMsg = `These are **${period} day** stats\n\n`;
+			let statsMsg = `<@${user.id}>'s **${period}** day stats:\n\n`;
 			platformQuestionMap.forEach((value, key) => {
 				statsMsg += `${key} Stats (id: ${userObj[key].id}) :\n\`t: ${value.All}\te: ${value.Easy}\tm: ${value.Medium}\th: ${value.Hard}\`\n\n`;
 			});
 			await interaction.editReply(
-				statsMsg === `These are **${period} day** stats\n\n`
+				statsMsg === `<@${user.id}>'s **${period}** day stats:\n\n`
 					? 'No stats available'
 					: statsMsg
 			);
