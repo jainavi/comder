@@ -102,4 +102,37 @@ const ping = (client) => {
 	}, 6000);
 };
 
-module.exports = { ping };
+const getDayWiseStats = async (userId, period) => {
+	const currDate = dayjs();
+	const platformQuestionMap = new Map();
+
+	try {
+		const userObj = await User.findOne({ discordId: userId });
+		if (!userObj) {
+			// eslint-disable-next-line quotes
+			return { platformQuestionMap: null, userObj };
+		}
+
+		const quesArr = userObj.questionsArr.filter((doc) => {
+			return currDate.diff(doc.timeStamp, 'day') <= period;
+		});
+		quesArr.forEach((doc) => {
+			if (!platformQuestionMap.has(doc.platform)) {
+				platformQuestionMap.set(doc.platform, {
+					All: 0,
+					Easy: 0,
+					Medium: 0,
+					Hard: 0,
+				});
+			}
+			const quesObj = platformQuestionMap.get(doc.platform);
+			quesObj[doc.difficulty] += doc.quantity;
+			platformQuestionMap.set(doc.platform, quesObj);
+		});
+		return { platformQuestionMap, userObj };
+	} catch (err) {
+		errorHandler(err);
+	}
+};
+
+module.exports = { ping, getDayWiseStats };

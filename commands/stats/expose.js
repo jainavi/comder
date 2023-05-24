@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
+
 const User = require('../../models/User');
-const dayjs = require('dayjs');
-const errorHandler = require('../../utilityFunctions/errorHandler');
+const { getDayWiseStats } = require('../../utilityFunctions/manager');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,43 +20,17 @@ module.exports = {
 		await interaction.deferReply();
 		const user = interaction.options.getUser('user');
 		const period = interaction.options.getNumber('days') || 1;
-		const currDate = dayjs();
-		const platformQuestionMap = new Map();
 
-		try {
-			const userObj = await User.findOne({ discordId: user.id });
-			if (!userObj) {
-				await interaction.editReply('No user found');
-				return;
-			}
-
-			const quesArr = userObj.questionsArr.filter((doc) => {
-				return currDate.diff(doc.timeStamp, 'day') <= period;
-			});
-			quesArr.forEach((doc) => {
-				if (!platformQuestionMap.has(doc.platform)) {
-					platformQuestionMap.set(doc.platform, {
-						All: 0,
-						Easy: 0,
-						Medium: 0,
-						Hard: 0,
-					});
-				}
-				const quesObj = platformQuestionMap.get(doc.platform);
-				quesObj[doc.difficulty] += doc.quantity;
-				platformQuestionMap.set(doc.platform, quesObj);
-			});
-			let statsMsg = `<@${user.id}>'s **${period}** day stats:\n\n`;
-			platformQuestionMap.forEach((value, key) => {
-				statsMsg += `${key} Stats (id: ${userObj[key].id}) :\n\`t: ${value.All}\te: ${value.Easy}\tm: ${value.Medium}\th: ${value.Hard}\`\n\n`;
-			});
-			await interaction.editReply(
-				statsMsg === `<@${user.id}>'s **${period}** day stats:\n\n`
-					? 'No stats available'
-					: statsMsg
-			);
-		} catch (err) {
-			errorHandler(err);
+		const { platformQuestionMap, userObj } = await getDayWiseStats(user.id, period);
+		if (!platformQuestionMap || platformQuestionMap.size === 0) {
+			await interaction.editReply('No stats available!');
+			return;
 		}
+
+		let statsMsg = `<@${user.id}>'s **${period}** day stats:\n\n`;
+		platformQuestionMap.forEach((value, key) => {
+			statsMsg += `${key} Stats (id: ${userObj[key].id}) :\n\`t: ${value.All}\te: ${value.Easy}\tm: ${value.Medium}\th: ${value.Hard}\`\n\n`;
+		});
+		await interaction.editReply(statsMsg);
 	},
 };
