@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 
-const manager = require('./utilityFunctions/manager');
 const keepAlive = require('./utilityFunctions/server');
 const errorHandler = require('./utilityFunctions/errorHandler');
 
@@ -69,7 +68,6 @@ mongoose
 	)
 	.then(() => {
 		console.log('Connected to DataBase!');
-		manager.ping(client);
 		client.login(TOKEN).catch((err) => errorHandler(err));
 		keepAlive();
 	})

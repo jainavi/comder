@@ -1,3 +1,4 @@
+const { EmbedBuilder } = require('discord.js');
 const dayjs = require('dayjs');
 
 const User = require('../models/User');
@@ -102,37 +103,125 @@ const ping = (client) => {
 	}, 6000);
 };
 
-const getDayWiseStats = async (userId, period) => {
+const getPeriodStats = async (userId, period = 1) => {
 	const currDate = dayjs();
 	const platformQuestionMap = new Map();
 
-	try {
-		const userObj = await User.findOne({ discordId: userId });
-		if (!userObj) {
-			// eslint-disable-next-line quotes
-			return { platformQuestionMap: null, userObj };
-		}
-
-		const quesArr = userObj.questionsArr.filter((doc) => {
-			return currDate.diff(doc.timeStamp, 'day') <= period;
-		});
-		quesArr.forEach((doc) => {
-			if (!platformQuestionMap.has(doc.platform)) {
-				platformQuestionMap.set(doc.platform, {
-					All: 0,
-					Easy: 0,
-					Medium: 0,
-					Hard: 0,
-				});
-			}
-			const quesObj = platformQuestionMap.get(doc.platform);
-			quesObj[doc.difficulty] += doc.quantity;
-			platformQuestionMap.set(doc.platform, quesObj);
-		});
-		return { platformQuestionMap, userObj };
-	} catch (err) {
-		errorHandler(err);
+	const userObj = await User.findOne({ discordId: userId });
+	if (!userObj) {
+		// eslint-disable-next-line quotes
+		return { platformQuestionMap: null, userObj };
 	}
+
+	const quesArr = userObj.questionsArr.filter((doc) => {
+		return currDate.diff(doc.timeStamp, 'day') <= period;
+	});
+	quesArr.forEach((doc) => {
+		if (!platformQuestionMap.has(doc.platform)) {
+			platformQuestionMap.set(doc.platform, {
+				All: 0,
+				Easy: 0,
+				Medium: 0,
+				Hard: 0,
+			});
+		}
+		const quesObj = platformQuestionMap.get(doc.platform);
+		quesObj[doc.difficulty] += doc.quantity;
+		platformQuestionMap.set(doc.platform, quesObj);
+	});
+	return { platformQuestionMap, userObj };
 };
 
-module.exports = { ping, getDayWiseStats };
+const getLeaderBoard = async (period = 1) => {
+	const userArr = await User.find({}, 'discordId');
+
+	const userStatsArr = [];
+	await Promise.all(
+		userArr.map(async (userObj) => {
+			const statsObj = {
+				totalPoints: 0,
+				All: 0,
+				Easy: 0,
+				Medium: 0,
+				Hard: 0,
+			};
+
+			const { platformQuestionMap: periodStats, userObj: user } =
+				await getPeriodStats(userObj.discordId, period);
+
+			periodStats.forEach((value, key) => {
+				statsObj.All += value.All;
+				statsObj.Easy += value.Easy;
+				statsObj.Medium += value.Medium;
+				statsObj.Hard += value.Hard;
+				statsObj.totalPoints += value.Easy * 1 + value.Medium * 2 + value.Hard * 4;
+			});
+			statsObj.user = user;
+			userStatsArr.push(statsObj);
+		})
+	);
+	userStatsArr.sort((a, b) => b.totalPoints - a.totalPoints);
+	return userStatsArr;
+};
+
+const showDailyLeaderBoard = async (client) => {
+	const channel = client.channels.cache.get(pingChannelId);
+	const now = new Date();
+	const targetTime = new Date();
+	targetTime.setUTCHours(19, 45, 0, 0);
+	let delay = targetTime.getTime() - now.getTime();
+	if (delay < 0) {
+		const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+		delay += oneDayInMilliseconds;
+	}
+
+	setTimeout(async () => {
+		const statsArr = await getLeaderBoard();
+		const leaderboardEmbed = new EmbedBuilder()
+			.setTitle('**⚔️🌟 DAILY LEADERBOARD UPDATE 🌟⚔️**')
+			.setColor('#ffd700')
+			.addFields(
+				{ name: '\u200B', value: '\u200B' },
+				{
+					name: '🥇 Champion',
+					value: `${
+						statsArr.length >= 0
+							? `<@${statsArr[0].user.discordId}> 🏆\n**\`t: ${statsArr[0].All}\`   \`e: ${statsArr[0].Easy}\`   \`m: ${statsArr[0].Medium}\`   \`h :${statsArr[0].Hard}\`\n\`total-points: ${statsArr[0].totalPoints}\`**`
+							: 'N/A'
+					}`,
+				},
+				{ name: '\u200B', value: '\u200B' },
+				{
+					name: '🥈 Runner-Up',
+					value: `${
+						statsArr.length >= 1
+							? `<@${statsArr[1].user.discordId}> 🏆\n**\`t: ${statsArr[1].All}\`   \`e: ${statsArr[1].Easy}\`   \`m: ${statsArr[1].Medium}\`   \`h :${statsArr[1].Hard}\`\n\`total-points: ${statsArr[1].totalPoints}\`**`
+							: 'N/A'
+					}`,
+				},
+				{ name: '\u200B', value: '\u200B' },
+				{
+					name: '🥉 Third Place',
+					value: `${
+						statsArr.length >= 2
+							? `<@${statsArr[2].user.discordId}> 🏆\n**\`t: ${statsArr[2].All}\`   \`e: ${statsArr[2].Easy}\`   \`m: ${statsArr[2].Medium}\`   \`h :${statsArr[2].Hard}\`\n\`total-points: ${statsArr[2].totalPoints}\`**`
+							: 'N/A'
+					}`,
+				},
+				{ name: '\u200B', value: '\u200B' },
+				{
+					name: '🌟🏅 Honorable Mention',
+					value: `${
+						statsArr.length >= 3
+							? `<@${statsArr[3].user.discordId}> 🏆\n**\`t: ${statsArr[3].All}\`   \`e: ${statsArr[3].Easy}\`   \`m: ${statsArr[3].Medium}\`   \`h :${statsArr[3].Hard}\`\n\`total-points: ${statsArr[3].totalPoints}\`**`
+							: 'N/A'
+					}`,
+				}
+			);
+
+		await channel.send({ embeds: [leaderboardEmbed] });
+		showDailyLeaderBoard(client);
+	}, delay);
+};
+
+module.exports = { ping, getPeriodStats, getLeaderBoard, showDailyLeaderBoard };
