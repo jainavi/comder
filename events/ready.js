@@ -9,5 +9,6 @@ module.exports = {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 		manager.ping(client);
 		manager.showDailyLeaderBoard(client);
+		manager.weeklyStatsSummary(client);
 	},
 };

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
-const { fetchOne } = require('../../utilityFunctions/leetcode');
+const leetCode = require('../../utilityFunctions/leetcode');
+const gfg = require('../../utilityFunctions/gfg');
 const User = require('../../models/User');
 const errorHandler = require('../../utilityFunctions/errorHandler');
 
@@ -44,12 +45,14 @@ module.exports = {
 		const codeStudioId = interaction.options.getString('code-studio-id');
 		const nickName = interaction.options.getString('nickname');
 		try {
-			const userData = await User.find({ discordId: discordId });
+			const userData = await User.findOne({ discordId: discordId });
 			if (userData.length > 0) {
 				await interaction.editReply('User already exist');
 				return;
 			}
-			const leetCodeData = await fetchOne(leetcodeId);
+			const leetCodeData = await leetCode.fetchOne(leetcodeId);
+			const gfgData = await gfg.fetchOne(gfgId);
+
 			const user = new User({
 				discordId,
 				nickName,
@@ -59,6 +62,7 @@ module.exports = {
 				},
 				gfg: {
 					id: gfgId,
+					stats: gfgData,
 				},
 				codeStudio: {
 					id: codeStudioId,

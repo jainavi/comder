@@ -35,6 +35,7 @@ const databaseSync = async () => {
 					const oldStats = user[platformObj.name].stats;
 					const newStats = platformObj.userStats.get(discordId);
 					const diffArr = [];
+					// Platform id is incorrect or deleted
 					if (!newStats) {
 						return;
 					}
@@ -224,4 +225,35 @@ const showDailyLeaderBoard = async (client) => {
 	}, delay);
 };
 
-module.exports = { ping, getPeriodStats, getLeaderBoard, showDailyLeaderBoard };
+const weeklyStatsSummary = async (client) => {
+	const channel = client.channels.cache.get(pingChannelId);
+	const usersStats = await getLeaderBoard(7);
+	const weeklyStatsEmbed = {
+		color: 0x5effb4,
+		title: '📈 WEEKLY STATS SUMMARY 📈',
+		description: 'Weekly stats of all users',
+		fields: [],
+		timeStamp: new Date().toISOString(),
+	};
+
+	usersStats.forEach((statsObj, index) => {
+		if (index != 0) {
+			weeklyStatsEmbed.fields.push({ name: '\u200B', value: '\u200B' });
+		}
+		weeklyStatsEmbed.fields.push({
+			name: '',
+			value: `💻 <@${statsObj.user.discordId}>\n\`t: ${statsObj.All}\` \`e: ${statsObj.Easy}\` \`m: ${statsObj.Medium}\` \`h: ${statsObj.Hard}\``,
+		});
+	});
+
+	await channel.send({ embeds: [weeklyStatsEmbed] });
+	setTimeout(weeklyStatsSummary, 7 * 24 * 60 * 60 * 1000);
+};
+
+module.exports = {
+	ping,
+	getPeriodStats,
+	getLeaderBoard,
+	showDailyLeaderBoard,
+	weeklyStatsSummary,
+};
